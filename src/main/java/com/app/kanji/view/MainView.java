@@ -41,7 +41,7 @@ public class MainView extends VerticalLayout {
         });
 
         setSizeFull();
-        
+
 
         grid.setSizeFull();
         add(searchField, grid);
