@@ -1,6 +1,6 @@
 services:
   - type: web
     name: kanji-pwa
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    plan: free
+    env: java
+    buildCommand: "./mvnw clean install"
+    startCommand: "java -jar target/*.jar"
