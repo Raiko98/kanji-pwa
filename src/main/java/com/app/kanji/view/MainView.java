@@ -6,6 +6,7 @@ import com.app.kanji.domain.KanjiReading;
 import com.app.kanji.domain.KanjiService;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
@@ -31,6 +32,17 @@ public class MainView extends VerticalLayout {
         grid.addColumn(KanjiReading::getKunYomi2).setHeader("kun-yomi 2");
         grid.addColumn(KanjiReading::getBedeutungKunYomi2).setHeader("Bedeutung kun-yomi 2");
 
+        grid.getColumns().forEach(column -> {
+            column.setAutoWidth(true);
+            column.setFlexGrow(0); // Prevent squishing
+            column.setResizable(true);
+            column.setClassNameGenerator(item -> "wrap-text");
+        });
+
+        Div gridWrapper = new Div(grid);
+        gridWrapper.setWidthFull();
+        gridWrapper.getStyle().set("overflowX", "auto"); // horizontal scroll if needed
+
         searchField.addValueChangeListener(e -> {
             String value = e.getValue().trim();
             if (!value.isEmpty()) {
@@ -40,10 +52,13 @@ public class MainView extends VerticalLayout {
             }
         });
 
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();      // Let it use full space
+        grid.setSizeFull();        // Let the grid expand inside
+        layout.add(grid);
+
         setSizeFull();
 
-
-        grid.setSizeFull();
-        add(searchField, grid);
+        add(searchField, gridWrapper,layout);
     }
 }
