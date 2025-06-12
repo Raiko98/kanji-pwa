@@ -14,4 +14,4 @@ RUN chmod +x mvnw
 RUN ./mvnw clean install
 
 # Run the app
-CMD ["java", "-jar", "target/kanji-pwa-1.0-SNAPSHOT.jar"]
+CMD ["java", "-jar", "target/*.jar"]

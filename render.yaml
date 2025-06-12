@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: kanji-pwa
-    env: java
-    buildCommand: "./mvnw clean install"
-    startCommand: "java -jar target/*.jar"
