@@ -23,14 +23,11 @@ public class KanjiService {
 
     private void loadCSV() {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("kanji_readings.csv")),
+                Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("kanji_readings_updated.csv")),
                 StandardCharsets.UTF_8))) {
             readings = reader.lines()
                     .skip(1)
-                    .map(line -> CSV_SPLIT.split(line, -1)) // preserve empty fields
-                    .map(fields -> Arrays.stream(fields)
-                            .map(f -> f.replaceAll("^\"|\"$", "")) // remove surrounding quotes
-                            .toArray(String[]::new))
+                    .map(line -> line.split(";", -1)) // important: -1 to preserve empty fields!
                     .map(KanjiReading::new)
                     .collect(Collectors.toList());
         } catch (Exception e) {

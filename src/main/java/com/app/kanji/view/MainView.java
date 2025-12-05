@@ -13,12 +13,49 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 @Route("")
 public class MainView extends VerticalLayout {
 
+    private void applyFilters(Grid<KanjiReading> grid,
+                              KanjiService kanjiService,
+                              TextField searchReading,
+                              TextField searchMeaning) {
+
+        String reading = searchReading.getValue().trim().toLowerCase();
+        String meaning = searchMeaning.getValue().trim().toLowerCase();
+
+        List<KanjiReading> results;
+
+        // CASE 1 — both empty => clear grid
+        if (reading.isEmpty() && meaning.isEmpty()) {
+            results = List.of();
+        }
+        // CASE 2 — only reading entered
+        else if (!reading.isEmpty() && meaning.isEmpty()) {
+            results = kanjiService.findByReading(reading);
+        }
+        // CASE 3 — only meaning entered
+        else if (reading.isEmpty() && !meaning.isEmpty()) {
+            results = kanjiService.findByMeaning(meaning);
+        }
+        // CASE 4 — both entered => apply both filters
+        else {
+            List<KanjiReading> readingMatches = kanjiService.findByReading(reading);
+
+            results = readingMatches.stream()
+                    .filter(r -> r.getHauptbedeutung() != null
+                            && r.getHauptbedeutung().toLowerCase().contains(meaning))
+                    .toList();
+        }
+
+        grid.setItems(results);
+    }
+
     public MainView(@Autowired KanjiService kanjiService) {
         TextField searchField = new TextField("Search On-/Kun-Yomi");
-        TextField searchFieldMeaning = new TextField("Hauptbedeutung");
+        TextField searchFieldMeaning = new TextField("Bedeutung");
         Grid<KanjiReading> grid = new Grid<>(KanjiReading.class, false);
 
         // Configure all columns manually for custom order
@@ -32,6 +69,8 @@ public class MainView extends VerticalLayout {
         grid.addColumn(KanjiReading::getBedeutungKunYomi1).setHeader("Bedeutung kun-yomi 1");
         grid.addColumn(KanjiReading::getKunYomi2).setHeader("kun-yomi 2");
         grid.addColumn(KanjiReading::getBedeutungKunYomi2).setHeader("Bedeutung kun-yomi 2");
+        grid.addColumn(KanjiReading::getKunYomi3).setHeader("kun-yomi 3");
+        grid.addColumn(KanjiReading::getBedeutungKunYomi3).setHeader("Bedeutung kun-yomi 3");
 
         grid.getColumns().forEach(column -> {
             column.setAutoWidth(true);
@@ -44,23 +83,14 @@ public class MainView extends VerticalLayout {
         gridWrapper.setWidthFull();
         gridWrapper.getStyle().set("overflowX", "auto"); // horizontal scroll if needed
 
-        searchField.addValueChangeListener(e -> {
-            String value = e.getValue().trim();
-            if (!value.isEmpty()) {
-                grid.setItems(kanjiService.findByReading(value));
-            } else {
-                grid.setItems();
-            }
-        });
 
-        searchFieldMeaning.addValueChangeListener(e -> {
-            String value = e.getValue().trim();
-            if (!value.isEmpty()) {
-                grid.setItems(kanjiService.findByMeaning(value));
-            } else {
-                grid.setItems();
-            }
-        });
+        searchField.addValueChangeListener(e ->
+                applyFilters(grid, kanjiService, searchField, searchFieldMeaning)
+        );
+
+        searchFieldMeaning.addValueChangeListener(e ->
+                applyFilters(grid, kanjiService, searchField, searchFieldMeaning)
+        );
 
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();      // Let it use full space

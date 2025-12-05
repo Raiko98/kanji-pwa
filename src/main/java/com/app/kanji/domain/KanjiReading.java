@@ -1,28 +1,32 @@
 package com.app.kanji.domain;
 
-        public class KanjiReading {
-            private String kanji;
-            private String hauptbedeutung;
-            private String onYomi1;
-            private String bedeutungOnYomi1;
-            private String onYomi2;
-            private String bedeutungOnYomi2;
-            private String kunYomi1;
-            private String bedeutungKunYomi1;
-            private String kunYomi2;
-            private String bedeutungKunYomi2;
+public class KanjiReading {
+    private String kanji;
+    private String hauptbedeutung;
+    private String onYomi1;
+    private String bedeutungOnYomi1;
+    private String onYomi2;
+    private String bedeutungOnYomi2;
+    private String kunYomi1;
+    private String bedeutungKunYomi1;
+    private String kunYomi2;
+    private String bedeutungKunYomi2;
+    private String kunYomi3;
+    private String bedeutungKunYomi3;
 
-            public KanjiReading(String... data) {
-                this.kanji = data[0];
-                this.hauptbedeutung = data[1];
-                this.onYomi1 = data[2];
-                this.bedeutungOnYomi1 = data[3];
-                this.onYomi2 = data[4];
-                this.bedeutungOnYomi2 = data[5];
-                this.kunYomi1 = data[6];
-                this.bedeutungKunYomi1 = data[7];
-                this.kunYomi2 = data[8];
-                this.bedeutungKunYomi2 = data[9];
+    public KanjiReading(String... data) {
+        this.kanji = data[0];
+        this.hauptbedeutung = data[1];
+        this.onYomi1 = data[2];
+        this.bedeutungOnYomi1 = data[3];
+        this.onYomi2 = data[4];
+        this.bedeutungOnYomi2 = data[5];
+        this.kunYomi1 = data[6];
+        this.bedeutungKunYomi1 = data[7];
+        this.kunYomi2 = data[8];
+        this.bedeutungKunYomi2 = data[9];
+        this.kunYomi3 = data[10];
+        this.bedeutungKunYomi3 = data[11];
     }
 
     // Getters
@@ -36,4 +40,10 @@ package com.app.kanji.domain;
     public String getBedeutungKunYomi1() { return bedeutungKunYomi1; }
     public String getKunYomi2() { return kunYomi2; }
     public String getBedeutungKunYomi2() { return bedeutungKunYomi2; }
+    public String getKunYomi3() {
+                return kunYomi3;
+            }
+    public String getBedeutungKunYomi3() {
+                return bedeutungKunYomi3;
+            }
 }
