@@ -3,8 +3,10 @@ package com.app.kanji.domain;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class KanjiService {
     private List<KanjiReading> readings;
+
+    private static final Pattern CSV_SPLIT = Pattern.compile(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
     public KanjiService() {
         loadCSV();
@@ -23,7 +27,10 @@ public class KanjiService {
                 StandardCharsets.UTF_8))) {
             readings = reader.lines()
                     .skip(1)
-                    .map(line -> line.split(",", -1))
+                    .map(line -> CSV_SPLIT.split(line, -1)) // preserve empty fields
+                    .map(fields -> Arrays.stream(fields)
+                            .map(f -> f.replaceAll("^\"|\"$", "")) // remove surrounding quotes
+                            .toArray(String[]::new))
                     .map(KanjiReading::new)
                     .collect(Collectors.toList());
         } catch (Exception e) {
@@ -65,11 +72,11 @@ public class KanjiService {
     }
 
     private boolean isPartialMatchMeaning(KanjiReading k, String input) {
-        return k.getHauptbedeutung().toLowerCase().startsWith(input)
-                || k.getBedeutungOnYomi1().toLowerCase().startsWith(input)
-                || k.getBedeutungOnYomi2().toLowerCase().startsWith(input)
-                || k.getBedeutungKunYomi1().toLowerCase().startsWith(input)
-                || k.getBedeutungKunYomi2().toLowerCase().startsWith(input);
+        return k.getHauptbedeutung().toLowerCase().contains(input)
+                || k.getBedeutungOnYomi1().toLowerCase().contains(input)
+                || k.getBedeutungOnYomi2().toLowerCase().contains(input)
+                || k.getBedeutungKunYomi1().toLowerCase().contains(input)
+                || k.getBedeutungKunYomi2().toLowerCase().contains(input);
     }
 
     private boolean isExactMatchOnYomi(KanjiReading k, String input) {
