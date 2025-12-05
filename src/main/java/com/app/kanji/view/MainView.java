@@ -9,6 +9,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,9 +89,13 @@ public class MainView extends VerticalLayout {
                 applyFilters(grid, kanjiService, searchField, searchFieldMeaning)
         );
 
+
         searchFieldMeaning.addValueChangeListener(e ->
                 applyFilters(grid, kanjiService, searchField, searchFieldMeaning)
         );
+
+        searchField.setValueChangeMode(ValueChangeMode.EAGER);
+        searchFieldMeaning.setValueChangeMode(ValueChangeMode.EAGER);
 
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();      // Let it use full space
