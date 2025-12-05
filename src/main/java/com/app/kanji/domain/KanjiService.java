@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.vaadin.flow.data.provider.DataProvider;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,31 +31,59 @@ public class KanjiService {
         }
     }
 
+    public List<KanjiReading> findByMeaning(String meaning){
+        String lower = meaning.toLowerCase();
+        return readings.stream()
+                .sorted((a, b) -> {
+                    boolean aExact = isExactMatchMeaning(a, lower);
+                    boolean bExact = isExactMatchMeaning(b, lower);
+                    return Boolean.compare(!aExact, !bExact); // true=false < false=true
+                })
+                .filter(k -> isPartialMatchMeaning(k, lower))
+                .collect(Collectors.toList());
+    }
+
     public List<KanjiReading> findByReading(String reading) {
         String lower = reading.toLowerCase();
 
         return readings.stream()
                 .sorted((a, b) -> {
-                    boolean aExact = isExactMatch(a, lower);
-                    boolean bExact = isExactMatch(b, lower);
+                    boolean aExact = isExactMatchOnYomi(a, lower);
+                    boolean bExact = isExactMatchOnYomi(b, lower);
                     return Boolean.compare(!aExact, !bExact); // true=false < false=true
                 })
-                .filter(k -> isPartialMatch(k, lower))
+                .filter(k -> isPartialMatchOnYomi(k, lower))
                 .collect(Collectors.toList());
     }
 
-    private boolean isExactMatch(KanjiReading k, String input) {
+    private boolean isExactMatchMeaning(KanjiReading k, String input) {
+        return k.getHauptbedeutung().equalsIgnoreCase(input)
+                || k.getBedeutungOnYomi1().equalsIgnoreCase(input)
+                || k.getBedeutungOnYomi2().equalsIgnoreCase(input)
+                || k.getBedeutungKunYomi1().equalsIgnoreCase(input)
+                || k.getBedeutungKunYomi2().equalsIgnoreCase(input);
+    }
+
+    private boolean isPartialMatchMeaning(KanjiReading k, String input) {
+        return k.getHauptbedeutung().toLowerCase().startsWith(input)
+                || k.getBedeutungOnYomi1().toLowerCase().startsWith(input)
+                || k.getBedeutungOnYomi2().toLowerCase().startsWith(input)
+                || k.getBedeutungKunYomi1().toLowerCase().startsWith(input)
+                || k.getBedeutungKunYomi2().toLowerCase().startsWith(input);
+    }
+
+    private boolean isExactMatchOnYomi(KanjiReading k, String input) {
         return k.getOnYomi1().equalsIgnoreCase(input)
                 || k.getOnYomi2().equalsIgnoreCase(input)
                 || k.getKunYomi1().equalsIgnoreCase(input)
                 || k.getKunYomi2().equalsIgnoreCase(input);
     }
 
-    private boolean isPartialMatch(KanjiReading k, String input) {
-        return (k.getOnYomi1().toLowerCase().startsWith(input)
+    private boolean isPartialMatchOnYomi(KanjiReading k, String input) {
+        return k.getOnYomi1().toLowerCase().startsWith(input)
                 || k.getOnYomi2().toLowerCase().startsWith(input)
                 || k.getKunYomi1().toLowerCase().startsWith(input)
-                || k.getKunYomi2().toLowerCase().startsWith(input));
+                || k.getKunYomi2().toLowerCase().startsWith(input);
     }
 
     public List<KanjiReading> findAll() {

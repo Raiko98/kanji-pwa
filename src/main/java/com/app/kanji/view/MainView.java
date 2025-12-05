@@ -18,6 +18,7 @@ public class MainView extends VerticalLayout {
 
     public MainView(@Autowired KanjiService kanjiService) {
         TextField searchField = new TextField("Search On-/Kun-Yomi");
+        TextField searchFieldMeaning = new TextField("Hauptbedeutung");
         Grid<KanjiReading> grid = new Grid<>(KanjiReading.class, false);
 
         // Configure all columns manually for custom order
@@ -52,6 +53,15 @@ public class MainView extends VerticalLayout {
             }
         });
 
+        searchFieldMeaning.addValueChangeListener(e -> {
+            String value = e.getValue().trim();
+            if (!value.isEmpty()) {
+                grid.setItems(kanjiService.findByMeaning(value));
+            } else {
+                grid.setItems();
+            }
+        });
+
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();      // Let it use full space
         grid.setSizeFull();        // Let the grid expand inside
@@ -59,6 +69,6 @@ public class MainView extends VerticalLayout {
 
         setSizeFull();
 
-        add(searchField, gridWrapper,layout);
+        add(searchField,searchFieldMeaning, gridWrapper,layout);
     }
 }
